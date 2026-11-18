@@ -9,3 +9,5 @@ models/*.pt
 .DS_Store
 *.egg-info/
 data/*.log
+!models/patchnet.pt
+colab/cell1.txt

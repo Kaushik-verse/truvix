@@ -114,16 +114,14 @@ def test_manifest_has_no_scene_leakage():
     assert sum(r["label"] == "0" for r in test) == sum(r["label"] == "1" for r in test)
 
 
-def test_trained_model_beats_chance_on_one_pair():
+def test_trained_model_flags_the_shipped_examples():
+    """The released model separates a pasted-damage photo from an honest one (docs/examples)."""
     p = ROOT / "models" / "patchnet.pt"
-    man = ROOT / "data" / "manifest.csv"
-    if not (p.exists() and man.exists()):
+    ex = ROOT / "docs" / "examples"
+    if not p.exists():
         pytest.skip("model not trained")
     from PIL import Image
     from claimshield.cli import load_model
-    model, _ = load_model(p)
-    rows = [r for r in csv.DictReader(open(man)) if r["split"] == "test" and r["family"] == "paint"][:1]
-    base = rows[0]["base_id"]
-    pair = [r for r in csv.DictReader(open(man)) if r["base_id"] == base]
-    s = {r["label"]: heatmap(model, np.asarray(Image.open(ROOT / "data" / r["image"]).convert("RGB")))[1] for r in pair}
-    assert s["1"] > s["0"]
+    model, thr = load_model(p)
+    score = lambda n: heatmap(model, np.asarray(Image.open(ex / f"{n}.png").convert("RGB")))[1]
+    assert score("splice") > thr > score("authentic")

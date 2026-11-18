@@ -121,27 +121,27 @@ def splice_damage(img: np.ndarray, donor: np.ndarray, rng: np.random.Generator) 
 class DiffusionInpainter:
     """Stable Diffusion 1.5 inpainting + LCM-LoRA (4-6 steps) so it runs on an 8 GB MacBook."""
 
-    def __init__(self, device: str | None = None):
+    def __init__(self, device: str | None = None, fp16: bool | None = None):
         import torch
         from diffusers import LCMScheduler, StableDiffusionInpaintPipeline
 
         self.torch = torch
         self.device = device or ("mps" if torch.backends.mps.is_available() else
                                  "cuda" if torch.cuda.is_available() else "cpu")
-        # fp16 UNet for speed; the VAE decode runs in fp32 below because on Apple MPS
-        # the fp16 VAE returns NaNs (black patches). Full fp32 swaps on an 8 GB machine.
-        dtype = torch.float16 if self.device != "cpu" else torch.float32
+        # fp16 only on CUDA. On Apple MPS the fp16 UNet returns NaNs (black patches),
+        # even with an fp32 VAE, so the Mac runs in fp32 (fits once nothing else is loaded).
+        fp16 = (self.device == "cuda") if fp16 is None else fp16
+        dtype = torch.float16 if fp16 else torch.float32
         pipe = StableDiffusionInpaintPipeline.from_pretrained(
-            "stable-diffusion-v1-5/stable-diffusion-inpainting", variant="fp16",  # fp16 files, upcast if needed
+            "stable-diffusion-v1-5/stable-diffusion-inpainting", variant="fp16",  # fp16 files, upcast on load
             torch_dtype=dtype, safety_checker=None, requires_safety_checker=False)
         pipe.scheduler = LCMScheduler.from_config(pipe.scheduler.config)
         pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
         pipe.fuse_lora()
         pipe.set_progress_bar_config(disable=True)
-        pipe.enable_attention_slicing()
+        pipe.enable_attention_slicing()  # 8 GB: the full 4096x4096 attention map does not fit
         self.pipe = pipe.to(self.device)
-        import copy
-        self.vae32 = copy.deepcopy(pipe.vae).to(self.device, torch.float32)
+        self.vae32 = pipe.vae if not fp16 else __import__("copy").deepcopy(pipe.vae).to(self.device, torch.float32)
 
     def __call__(self, img: np.ndarray, mask: np.ndarray, prompt: str, seed: int,
                  steps: int = 5, paste_back: bool = True) -> tuple[np.ndarray, np.ndarray]:
@@ -154,7 +154,7 @@ class DiffusionInpainter:
         res = self.pipe(prompt=f"a photo of {prompt}, realistic, indoor",
                         negative_prompt=NEGATIVE_PROMPT,
                         image=Image.fromarray(img), mask_image=Image.fromarray(dil * 255),
-                        height=h, width=w, num_inference_steps=steps, guidance_scale=1.2,
+                        height=h, width=w, num_inference_steps=steps, guidance_scale=1.0,
                         generator=g, output_type="latent").images
         with self.torch.no_grad():
             dec = self.vae32.decode(res.float() / self.vae32.config.scaling_factor).sample
