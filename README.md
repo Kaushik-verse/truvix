@@ -127,7 +127,7 @@ To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T
 
 ## References
 
-- Quattoni & Torralba, *Recognizing Indoor Scenes*, CVPR 2009 — base photos (MIT Indoor-67).
+- Quattoni & Torralba, *Recognizing Indoor Scenes*, CVPR 2009 — base photos ([MIT Indoor-67](https://web.mit.edu/torralba/www/indoor.html), research use only).
 - Fridrich & Kodovsky, *Rich Models for Steganalysis of Digital Images*, IEEE TIFS 2012 — SRM residual filters.
 - He et al., *Deep Residual Learning for Image Recognition*, CVPR 2016, [arXiv:1512.03385](https://arxiv.org/abs/1512.03385).
 - Tan & Le, *EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks*, ICML 2019, [arXiv:1905.11946](https://arxiv.org/abs/1905.11946).
@@ -138,6 +138,18 @@ To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T
 - Rombach et al., *High-Resolution Image Synthesis with Latent Diffusion Models*, CVPR 2022, [arXiv:2112.10752](https://arxiv.org/abs/2112.10752); Luo et al., *LCM-LoRA*, [arXiv:2311.05556](https://arxiv.org/abs/2311.05556) — the generator used for the diffusion edits.
 - Zhu et al., *GenImage: a million-scale benchmark for detecting AI-generated images*, NeurIPS 2023, [arXiv:2306.08571](https://arxiv.org/abs/2306.08571) — public benchmark for future comparison.
 
-## Licence
+## Data, licences and attribution
 
-MIT © Ch Kaushik
+| What | Source | Terms |
+|---|---|---|
+| Room photos | [MIT Indoor-67](https://web.mit.edu/torralba/www/indoor.html) (Quattoni & Torralba, CVPR 2009), via the [Hugging Face mirror](https://huggingface.co/datasets/NuclearUnicorn-UWC/mit-indoor-outdoor) | "for research purposes only"; downloaded at run time, not redistributed |
+| Diffusion edits | [Stable Diffusion 1.5 inpainting](https://huggingface.co/stable-diffusion-v1-5/stable-diffusion-inpainting) + [LCM-LoRA](https://huggingface.co/latent-consistency/lcm-lora-sdv1-5) | CreativeML OpenRAIL-M / OpenRAIL++; weights not redistributed |
+| Detector starting weights | torchvision ImageNet ResNet / EfficientNet | BSD-3-Clause code; ImageNet non-commercial research terms |
+| Libraries | PyTorch, scikit-learn, OpenCV, Pillow, diffusers, transformers, … | BSD / Apache-2.0 / MIT (full list in [NOTICE.md](NOTICE.md)) |
+
+- **Code: MIT** © 2026 Ch Kaushik ([LICENSE](LICENSE)).
+- **The example photos in `docs/` and the trained weights in `models/` are derived from MIT Indoor-67. They are for research and education only** and are not covered by the MIT License. If you own one of the photos and want it removed, open an issue.
+- The edited and generated images exist only to train and test a detector. They show no real claim, and must not be used to deceive anyone.
+- **ClaimShield is an independent project. It is not affiliated with or endorsed by Airbnb, Inc.** The company is named only to cite public news reports.
+
+Full details are in [NOTICE.md](NOTICE.md). If you use this work, please cite it ([CITATION.cff](CITATION.cff)) together with the papers above.

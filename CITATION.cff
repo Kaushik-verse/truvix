@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use ClaimShield, please cite it as below, together with the MIT Indoor-67 dataset paper."
+title: "ClaimShield: detecting doctored photos in rental damage claims"
+type: software
+authors:
+  - name: "Ch Kaushik"
+repository-code: "https://github.com/Kaushik-verse/claimshield"
+license: MIT
+date-released: "2026-11-18"
+keywords:
+  - image forensics
+  - AI-generated image detection
+  - image manipulation detection
+  - fraud detection
+  - trust and safety
+references:
+  - type: conference-paper
+    title: "Recognizing Indoor Scenes"
+    authors:
+      - family-names: Quattoni
+        given-names: Ariadna
+      - family-names: Torralba
+        given-names: Antonio
+    conference:
+      name: "IEEE Conference on Computer Vision and Pattern Recognition (CVPR)"
+    year: 2009
+    doi: "10.1109/CVPR.2009.5206537"
