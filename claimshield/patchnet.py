@@ -7,7 +7,7 @@ from __future__ import annotations
 import numpy as np
 import torch
 import torch.nn as nn
-from torchvision.models import ResNet18_Weights, resnet18
+from torchvision import models as tvm
 
 PATCH = 128
 STRIDE = 64
@@ -20,9 +20,35 @@ def device() -> str:
     return "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
 
 
-def build(pretrained: bool = True) -> nn.Module:
-    m = resnet18(weights=ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
-    m.fc = nn.Linear(m.fc.in_features, 1)
+ARCHS = ("resnet18", "resnet50", "efficientnet_b0")
+
+
+def build(pretrained: bool = True, arch: str = "resnet18") -> nn.Module:
+    """ImageNet backbone with a single "edited?" logit."""
+    if arch == "resnet18":
+        m = tvm.resnet18(weights=tvm.ResNet18_Weights.IMAGENET1K_V1 if pretrained else None)
+        m.fc = nn.Linear(m.fc.in_features, 1)
+    elif arch == "resnet50":
+        m = tvm.resnet50(weights=tvm.ResNet50_Weights.IMAGENET1K_V2 if pretrained else None)
+        m.fc = nn.Linear(m.fc.in_features, 1)
+    elif arch == "efficientnet_b0":
+        m = tvm.efficientnet_b0(weights=tvm.EfficientNet_B0_Weights.IMAGENET1K_V1 if pretrained else None)
+        m.classifier[-1] = nn.Linear(m.classifier[-1].in_features, 1)
+    else:
+        raise ValueError(arch)
+    return m
+
+
+def load(path, dev: str | None = None) -> nn.Module:
+    """Load a checkpoint; the architecture is read from the JSON written next to it."""
+    import json
+    from pathlib import Path
+
+    meta = Path(path).with_suffix(".json")
+    arch = json.loads(meta.read_text()).get("arch", "resnet18") if meta.exists() else "resnet18"
+    dev = dev or device()
+    m = build(pretrained=False, arch=arch).to(dev).eval()
+    m.load_state_dict(torch.load(path, map_location=dev))
     return m
 
 

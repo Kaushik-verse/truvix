@@ -8,19 +8,16 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-import torch
 from PIL import Image
 
-from .patchnet import build, device, heatmap
+from .patchnet import heatmap, load
 
 ROOT = Path(__file__).resolve().parent.parent
 
 
 def load_model(path: Path | None = None):
     path = path or ROOT / "models" / "patchnet.pt"
-    dev = device()
-    m = build(pretrained=False).to(dev).eval()
-    m.load_state_dict(torch.load(path, map_location=dev))
+    m = load(path)
     meta = json.loads((ROOT / "results" / "metrics.json").read_text()) if (ROOT / "results" / "metrics.json").exists() else {}
     thr = meta.get("detectors", {}).get("patchnet", {}).get("threshold", 0.5)
     return m, thr

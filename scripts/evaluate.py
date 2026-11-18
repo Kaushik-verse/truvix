@@ -18,7 +18,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 from claimshield.features import ela_features, srm_features
-from claimshield.patchnet import build, device, heatmap
+from claimshield.patchnet import device, heatmap, load as load_net
 from claimshield.postprocess import attack
 
 FAMILIES = ["paint", "splice", "diffusion"]
@@ -29,6 +29,18 @@ MAX_FPR = 0.05
 def threshold_at_fpr(y, s, max_fpr=MAX_FPR):
     neg = np.sort(np.asarray(s)[np.asarray(y) == 0])
     return float(neg[min(len(neg) - 1, int(np.ceil((1 - max_fpr) * len(neg))))]) + 1e-9
+
+
+def auc_ci(y, s, n_boot: int = 1000, seed: int = 0):
+    """95% bootstrap interval for ROC-AUC (resampling photos with replacement)."""
+    y, s = np.asarray(y), np.asarray(s)
+    rng = np.random.default_rng(seed)
+    out = []
+    for _ in range(n_boot):
+        i = rng.integers(0, len(y), len(y))
+        if len(set(y[i])) == 2:
+            out.append(roc_auc_score(y[i], s[i]))
+    return [round(float(np.percentile(out, 2.5)), 4), round(float(np.percentile(out, 97.5)), 4)]
 
 
 def summary(y, s, thr):
@@ -93,8 +105,7 @@ def main() -> None:
 
     # ---------- the patch detector
     dev = device()
-    model = build(pretrained=False).to(dev).eval()
-    model.load_state_dict(torch.load(Path(args.models) / "patchnet.pt", map_location=dev))
+    model = load_net(Path(args.models) / "patchnet.pt", dev)
     cache = {}
 
     def pn_scores(rs):
@@ -113,16 +124,19 @@ def main() -> None:
         print(name, flush=True)
         thr = threshold_at_fpr([r["label"] for r in va], score_rows(va))
         y_te, s_te = [r["label"] for r in te], score_rows(te)
-        d = {"threshold": round(thr, 6), "test": summary(y_te, s_te, thr), "per_family": {}}
+        d = {"threshold": round(thr, 6), "test": {**summary(y_te, s_te, thr), "auc_95ci": auc_ci(y_te, s_te)},
+             "val_auc": round(float(roc_auc_score([r["label"] for r in va], score_rows(va))), 4), "per_family": {}}
         auth = [r for r in te if r["label"] == 0]
         s_auth = score_rows(auth)
         for f in families:
             fr = [r for r in te if r["family"] == f]
-            d["per_family"][f] = summary([0] * len(auth) + [1] * len(fr), np.r_[s_auth, score_rows(fr)], thr)
+            yf, sf = [0] * len(auth) + [1] * len(fr), np.r_[s_auth, score_rows(fr)]
+            d["per_family"][f] = {**summary(yf, sf, thr), "auc_95ci": auc_ci(yf, sf)}
         d["unseen_tools"] = {}
         for f in sorted({r["family"] for r in ood}):
             fr = [r for r in ood if r["family"] == f]
-            d["unseen_tools"][f] = summary([0] * len(auth) + [1] * len(fr), np.r_[s_auth, score_rows(fr)], thr)
+            yf, sf = [0] * len(auth) + [1] * len(fr), np.r_[s_auth, score_rows(fr)]
+            d["unseen_tools"][f] = {**summary(yf, sf, thr), "auc_95ci": auc_ci(yf, sf)}
         d["robustness"] = {}
         for a in ATTACKS:
             ims = [att_imgs[a][r["image"]] for r in te]
@@ -159,14 +173,20 @@ def main() -> None:
                                     clf.predict_proba(np.stack([feat[r["image"]][k] for r in va if r["family"] != f]))[:, 1])
             entry[name] = summary(y, clf.predict_proba(np.stack([feat[r["image"]][k] for r in auth + fr]))[:, 1], vthr)
         if p.exists():
-            m = build(pretrained=False).to(dev).eval()
-            m.load_state_dict(torch.load(p, map_location=dev))
+            m = load_net(p, dev)
             sc = lambda rs: np.array([heatmap(m, load(root, r), dev)[1] for r in rs])
             vr = [r for r in va if r["family"] != f]
             vthr = threshold_at_fpr([r["label"] for r in vr], sc(vr))
             entry["patchnet"] = summary(y, sc(auth + fr), vthr)
         res["lofo"][f] = entry
 
+    meta = Path(args.models) / "patchnet.json"
+    if meta.exists():
+        m = json.loads(meta.read_text())
+        res["patchnet_model"] = {k: m.get(k) for k in ("arch", "launder", "epochs", "best_val_image_auc")}
+    gs = root / "generation_stats.json"
+    if gs.exists():
+        res["generation"] = json.loads(gs.read_text())
     json.dump(res, open(out / "metrics.json", "w"), indent=2)
     print(json.dumps(res, indent=2))
 

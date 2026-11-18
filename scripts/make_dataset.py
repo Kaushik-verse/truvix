@@ -18,7 +18,7 @@ from PIL import Image
 
 import cv2
 
-from claimshield.damage import DAMAGE_PROMPTS, paint_damage, random_blob_mask, splice_damage
+from claimshield.damage import DAMAGE_PROMPTS, paint_damage, random_blob_mask, splice_damage, visible_mask
 from claimshield.postprocess import benign_global_edit, delivery, square_crop
 
 FAMILIES = ["paint", "splice", "diffusion"]
@@ -42,6 +42,11 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=2026)
     ap.add_argument("--diffusion", action="store_true")
     ap.add_argument("--ood", type=int, default=60, help="fully generated 'damage' photos, test only (needs --diffusion)")
+    ap.add_argument("--guidance", type=float, default=1.0, help="SD guidance; >1 follows the damage prompt more strongly")
+    ap.add_argument("--steps", type=int, default=5, help="SD (LCM) denoising steps")
+    ap.add_argument("--min-visible", type=float, default=0.0,
+                    help="v3: an edit must visibly change at least this share of the image, else retry with a new seed")
+    ap.add_argument("--max-tries", type=int, default=4)
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -67,22 +72,41 @@ def main() -> None:
         from claimshield.damage import DiffusionInpainter
         inpaint = DiffusionInpainter()
     rows = []
+    stats = {"rejected": {f: 0 for f in families}, "kept_after_max_tries": {f: 0 for f in families},
+             "tries": {f: [] for f in families}}
     t0 = time.time()
     for k, b in enumerate(bases):
         bid = b.stem
         img = benign_global_edit(load(b), rng)
         family = families[k % len(families)]
-        if family == "paint":
-            fake, mask = paint_damage(img, rng)
-            prompt = ""
-        elif family == "splice":
-            donor = img if rng.random() < 0.5 else load(bases[int(rng.integers(len(bases)))])
-            fake, mask = splice_damage(img, donor, rng)
-            prompt = ""
-        else:
+
+        def make_edit():
+            if family == "paint":
+                fake, mask = paint_damage(img, rng)
+                return fake, mask, ""
+            if family == "splice":
+                donor = img if rng.random() < 0.5 else load(bases[int(rng.integers(len(bases)))])
+                fake, mask = splice_damage(img, donor, rng)
+                return fake, mask, ""
             mask = random_blob_mask(*img.shape[:2], rng)
             prompt = DAMAGE_PROMPTS[int(rng.integers(len(DAMAGE_PROMPTS)))]
-            fake, mask = inpaint(img, mask, prompt, seed=int(rng.integers(1 << 30)))
+            fake, mask = inpaint(img, mask, prompt, seed=int(rng.integers(1 << 30)),
+                                 steps=args.steps, guidance=args.guidance)
+            return fake, mask, prompt
+
+        for tries in range(1, args.max_tries + 1):
+            fake, mask, prompt = make_edit()
+            if args.min_visible <= 0:
+                break
+            vis = visible_mask(img, fake, mask)
+            if vis.mean() >= args.min_visible:
+                mask = vis  # label = pixels that visibly changed
+                break
+            stats["rejected"][family] += 1
+        else:
+            mask = visible_mask(img, fake, mask) if visible_mask(img, fake, mask).any() else mask
+            stats["kept_after_max_tries"][family] += 1
+        stats["tries"][family].append(tries)
 
         for label, im, m in [(0, img, None), (1, fake, mask)]:
             name = f"{bid}_{'fake' if label else 'real'}"
@@ -104,6 +128,8 @@ def main() -> None:
         img = benign_global_edit(load(b), rng)
         mask = random_blob_mask(*img.shape[:2], rng, (0.03, 0.12))
         fake = cv2.inpaint(img, mask, 5, cv2.INPAINT_TELEA)
+        if args.min_visible > 0 and visible_mask(img, fake, mask).any():
+            mask = visible_mask(img, fake, mask)
         im2, m2, pp = delivery(fake, mask, rng)
         name = f"{b.stem}_telea"
         Image.fromarray(im2).save(out / "images" / f"{name}.png")
@@ -118,7 +144,8 @@ def main() -> None:
         blank = np.full((512, 512, 3), 127, np.uint8)
         for i in range(args.ood):
             prompt = OOD_PROMPTS[i % len(OOD_PROMPTS)]
-            gen, _ = inpaint(blank, full, prompt, seed=10_000 + i, steps=6, paste_back=False)
+            gen, _ = inpaint(blank, full, prompt, seed=10_000 + i, steps=max(args.steps, 6),
+                             paste_back=False, guidance=args.guidance)
             im2, _, pp = delivery(gen, None, rng)
             name = f"ood_{i:03d}_fake"
             Image.fromarray(im2).save(out / "images" / f"{name}.png")
@@ -129,6 +156,12 @@ def main() -> None:
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
+    import json
+    summary = {"guidance": args.guidance, "steps": args.steps, "min_visible": args.min_visible,
+               "rejected_edits": stats["rejected"], "kept_after_max_tries": stats["kept_after_max_tries"],
+               "mean_tries": {f: round(float(np.mean(v)), 3) for f, v in stats["tries"].items() if v}}
+    (out / "generation_stats.json").write_text(json.dumps(summary, indent=2))
+    print(json.dumps(summary))
     print("done", len(rows), f"{time.time() - t0:.0f}s")
 
 

@@ -118,8 +118,8 @@ def test_trained_model_flags_the_shipped_examples():
     """The released model separates a pasted-damage photo from an honest one (docs/examples)."""
     p = ROOT / "models" / "patchnet.pt"
     ex = ROOT / "docs" / "examples"
-    if not p.exists():
-        pytest.skip("model not trained")
+    if not (p.exists() and (ex / "splice.png").exists()):
+        pytest.skip("model or examples missing")
     from PIL import Image
     from claimshield.cli import load_model
     model, thr = load_model(p)

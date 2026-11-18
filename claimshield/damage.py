@@ -44,6 +44,17 @@ def random_blob_mask(h: int, w: int, rng: np.random.Generator,
     return mask
 
 
+def visible_mask(before: np.ndarray, after: np.ndarray, mask: np.ndarray, thr: float = 6.0) -> np.ndarray:
+    """Pixels inside `mask` that visibly changed (smoothed mean |RGB difference| above `thr`).
+
+    Used as the training label so a "fake" patch always contains a change a person
+    could see, instead of mask pixels the editor left untouched.
+    """
+    d = np.abs(before.astype(np.float32) - after.astype(np.float32)).mean(axis=2)
+    d = cv2.GaussianBlur(d, (5, 5), 0)
+    return ((d > thr) & (mask > 0)).astype(np.uint8)
+
+
 def feather(mask: np.ndarray, k: int = 7) -> np.ndarray:
     m = cv2.GaussianBlur(mask.astype(np.float32), (k | 1, k | 1), 0)
     return np.clip(m, 0, 1)[..., None]
@@ -144,7 +155,7 @@ class DiffusionInpainter:
         self.vae32 = pipe.vae if not fp16 else __import__("copy").deepcopy(pipe.vae).to(self.device, torch.float32)
 
     def __call__(self, img: np.ndarray, mask: np.ndarray, prompt: str, seed: int,
-                 steps: int = 5, paste_back: bool = True) -> tuple[np.ndarray, np.ndarray]:
+                 steps: int = 5, paste_back: bool = True, guidance: float = 1.0) -> tuple[np.ndarray, np.ndarray]:
         """Returns (edited image, mask of pixels the model changed)."""
         from PIL import Image
 
@@ -154,7 +165,7 @@ class DiffusionInpainter:
         res = self.pipe(prompt=f"a photo of {prompt}, realistic, indoor",
                         negative_prompt=NEGATIVE_PROMPT,
                         image=Image.fromarray(img), mask_image=Image.fromarray(dil * 255),
-                        height=h, width=w, num_inference_steps=steps, guidance_scale=1.0,
+                        height=h, width=w, num_inference_steps=steps, guidance_scale=guidance,
                         generator=g, output_type="latent").images
         with self.torch.no_grad():
             dec = self.vae32.decode(res.float() / self.vae32.config.scaling_factor).sample
