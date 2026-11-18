@@ -128,8 +128,9 @@ class DiffusionInpainter:
         self.torch = torch
         self.device = device or ("mps" if torch.backends.mps.is_available() else
                                  "cuda" if torch.cuda.is_available() else "cpu")
-        # fp16 only on CUDA: on Apple MPS the fp16 VAE returns NaNs (black patches)
-        dtype = torch.float16 if self.device == "cuda" else torch.float32
+        # fp16 UNet for speed; the VAE decode runs in fp32 below because on Apple MPS
+        # the fp16 VAE returns NaNs (black patches). Full fp32 swaps on an 8 GB machine.
+        dtype = torch.float16 if self.device != "cpu" else torch.float32
         pipe = StableDiffusionInpaintPipeline.from_pretrained(
             "stable-diffusion-v1-5/stable-diffusion-inpainting", variant="fp16",  # fp16 files, upcast if needed
             torch_dtype=dtype, safety_checker=None, requires_safety_checker=False)
@@ -139,6 +140,8 @@ class DiffusionInpainter:
         pipe.set_progress_bar_config(disable=True)
         pipe.enable_attention_slicing()
         self.pipe = pipe.to(self.device)
+        import copy
+        self.vae32 = copy.deepcopy(pipe.vae).to(self.device, torch.float32)
 
     def __call__(self, img: np.ndarray, mask: np.ndarray, prompt: str, seed: int,
                  steps: int = 5, paste_back: bool = True) -> tuple[np.ndarray, np.ndarray]:
@@ -152,8 +155,12 @@ class DiffusionInpainter:
                         negative_prompt=NEGATIVE_PROMPT,
                         image=Image.fromarray(img), mask_image=Image.fromarray(dil * 255),
                         height=h, width=w, num_inference_steps=steps, guidance_scale=1.2,
-                        generator=g).images[0]
-        gen = np.asarray(res.convert("RGB"))
+                        generator=g, output_type="latent").images
+        with self.torch.no_grad():
+            dec = self.vae32.decode(res.float() / self.vae32.config.scaling_factor).sample
+        gen = ((dec[0].permute(1, 2, 0).clamp(-1, 1) + 1) * 127.5).round().byte().cpu().numpy()
+        if not np.isfinite(dec.cpu().numpy()).all():
+            raise RuntimeError("generator returned NaN")
         if not paste_back:
             return gen, np.ones_like(mask)
         return blend(img, gen, dil, k=9), dil

@@ -1,8 +1,0 @@
-bedroom 190
-livingroom 190
-bathroom 182
-skip indoorCVPR_09/Images/kitchen/modern kitchen.jpg URL can't contain control characters. '/datasets/NuclearUnicorn-UWC/mit-indoor-outdoor/resolve/main/indoorCVPR_09/Images/kitchen/modern kitchen.jpg' (found at least ' ')
-kitchen 190
-skip indoorCVPR_09/Images/dining_room/salle a manger.jpg URL can't contain control characters. '/datasets/NuclearUnicorn-UWC/mit-indoor-outdoor/resolve/main/indoorCVPR_09/Images/dining_room/salle a manger.jpg' (found at least ' ')
-skip indoorCVPR_09/Images/dining_room/Dinning Room.jpg URL can't contain control characters. '/datasets/NuclearUnicorn-UWC/mit-indoor-outdoor/resolve/main/indoorCVPR_09/Images/dining_room/Dinning Room.jpg' (found at least ' ')
-dining_room 190

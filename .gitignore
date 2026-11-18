@@ -7,3 +7,5 @@ data/images/
 data/masks/
 models/*.pt
 .DS_Store
+*.egg-info/
+data/*.log
