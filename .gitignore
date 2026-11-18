@@ -11,3 +11,4 @@ models/*.pt
 data/*.log
 !models/patchnet.pt
 colab/cell1.txt
+demo_output.png

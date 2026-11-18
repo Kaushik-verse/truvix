@@ -2,7 +2,7 @@
 
 A host says the guest broke the table and sends a photo. Was the crack really there, or was it painted in, pasted in, or generated? ClaimShield scores a damage-claim photo for signs of local editing and draws a heatmap of where the edit is, so a reviewer looks at the right part of the picture before money moves.
 
-**Try it:** [open the notebook in Colab](https://colab.research.google.com/github/Kaushik-verse/claimshield/blob/main/colab/claimshield_colab.ipynb) (free T4, about 1.5 h end to end) · [results](#results) · [where it fails](#what-does-not-work)
+**Start here:** [the illustrated guide (PDF, 14 pages)](docs/ClaimShield_Guide.pdf) · [open the notebook in Colab](https://colab.research.google.com/github/Kaushik-verse/claimshield/blob/main/colab/claimshield_colab.ipynb) (free T4, about 1.5 h end to end) · [results](#results) · [where it fails](#what-does-not-work)
 
 ## Why this exists
 
@@ -120,7 +120,9 @@ Localisation (pixel F1 of the heatmap at 0.5 against the true edit mask): splice
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"            # add ".[generate]" for the diffusion family
-python -m claimshield.cli claim.jpg --heatmap claim_heatmap.png
+python -m pytest -q tests                                       # 12 passed
+python scripts/demo.py && open demo_output.png                  # heatmaps on 12 example photos
+python -m claimshield.cli claim.jpg --heatmap claim_heatmap.png # your own photo
 ```
 
 To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T4 and Run all (about 1.5 h). The notebook clones this repository, then runs each step in its own cell with a short explanation, and shows the result tables and heatmaps inline. `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
