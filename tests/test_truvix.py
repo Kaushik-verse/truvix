@@ -5,10 +5,10 @@ import numpy as np
 import pytest
 import torch
 
-from claimshield.damage import blend, paint_damage, random_blob_mask, splice_damage
-from claimshield.features import ELA_DIM, SRM_DIM, ela_features, srm_features
-from claimshield.patchnet import PATCH, build, grid, heatmap, patch_labels
-from claimshield.postprocess import attack, benign_global_edit, delivery, square_crop
+from truvix.damage import blend, paint_damage, random_blob_mask, splice_damage
+from truvix.features import ELA_DIM, SRM_DIM, ela_features, srm_features
+from truvix.patchnet import PATCH, build, grid, heatmap, patch_labels
+from truvix.postprocess import attack, benign_global_edit, delivery, square_crop
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -121,7 +121,19 @@ def test_trained_model_flags_the_shipped_examples():
     if not (p.exists() and (ex / "splice.png").exists()):
         pytest.skip("model or examples missing")
     from PIL import Image
-    from claimshield.cli import load_model
+    from truvix.cli import load_model
     model, thr = load_model(p)
     score = lambda n: heatmap(model, np.asarray(Image.open(ex / f"{n}.png").convert("RGB")))[1]
     assert score("splice") > thr > score("authentic")
+
+
+def test_streamlit_app_renders_without_errors():
+    """The web app loads, scans the default example and draws every tab without raising."""
+    pytest.importorskip("streamlit")
+    if not (ROOT / "models" / "patchnet.pt").exists():
+        pytest.skip("model not trained")
+    from streamlit.testing.v1 import AppTest
+    at = AppTest.from_file(str(ROOT / "app.py"), default_timeout=120).run()
+    assert not at.exception, at.exception
+    assert [t.label for t in at.tabs] == ["Try it", "How it works", "Results"]
+    assert any("Truvix" in m.value for m in at.markdown)

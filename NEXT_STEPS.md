@@ -22,4 +22,4 @@
 
 ## Reproduce
 
-Open `colab/claimshield_colab.ipynb` in Colab (it clones the public repo), choose T4, Run all (about 1.5 h). The last cell downloads `claimshield_results.tar.gz`.
+Open `colab/truvix_colab.ipynb` in Colab (it clones the public repo), choose T4, Run all (about 1.5 h). The last cell downloads `truvix_results.tar.gz`.

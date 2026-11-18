@@ -1,15 +1,15 @@
-# ClaimShield showcase figures. Paste into a new cell in the SAME Colab session that ran v3.
+# Truvix showcase figures. Paste into a new cell in the SAME Colab session that ran v3.
 # Uses the trained model and dataset already on the runtime; no retraining (about 1 minute).
 import os, csv, zipfile, random
 import numpy as np, matplotlib.pyplot as plt
 from PIL import Image
 
-os.chdir("/content/claimshield")
+os.chdir("/content/truvix")
 if not (os.path.exists("models/patchnet.pt") and os.path.isdir("data/images")):
     raise SystemExit("Runtime was reset: the v3 data is gone. Tell Claude.")
 
-from claimshield.cli import load_model, overlay
-from claimshield.patchnet import heatmap
+from truvix.cli import load_model, overlay
+from truvix.patchnet import heatmap
 
 BG = "#F7F6F2"
 plt.rcParams.update({"font.family": "serif", "figure.facecolor": BG, "savefig.facecolor": BG})
@@ -56,9 +56,9 @@ plt.tight_layout()
 plt.savefig("showcase/heatmaps_random.png", dpi=110)
 plt.show()
 
-with zipfile.ZipFile("claimshield_showcase.zip", "w") as z:
+with zipfile.ZipFile("truvix_showcase.zip", "w") as z:
     for f in os.listdir("showcase"):
         z.write("showcase/" + f, f)
 from google.colab import files
-files.download("claimshield_showcase.zip")
-print("done: claimshield_showcase.zip")
+files.download("truvix_showcase.zip")
+print("done: truvix_showcase.zip")

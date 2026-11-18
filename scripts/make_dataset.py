@@ -1,4 +1,4 @@
-"""Build the ClaimShield dataset from the downloaded base photos.
+"""Build the Truvix dataset from the downloaded base photos.
 
 For each real room photo we write one authentic claim photo and one tampered claim
 photo (same scene, so the detector cannot cheat on scene content), both pushed
@@ -18,8 +18,8 @@ from PIL import Image
 
 import cv2
 
-from claimshield.damage import DAMAGE_PROMPTS, paint_damage, random_blob_mask, splice_damage, visible_mask
-from claimshield.postprocess import benign_global_edit, delivery, square_crop
+from truvix.damage import DAMAGE_PROMPTS, paint_damage, random_blob_mask, splice_damage, visible_mask
+from truvix.postprocess import benign_global_edit, delivery, square_crop
 
 FAMILIES = ["paint", "splice", "diffusion"]
 OOD_PROMPTS = [
@@ -69,7 +69,7 @@ def main() -> None:
     families = [f for f in FAMILIES if args.diffusion or f != "diffusion"]
     inpaint = None
     if args.diffusion:
-        from claimshield.damage import DiffusionInpainter
+        from truvix.damage import DiffusionInpainter
         inpaint = DiffusionInpainter()
     rows = []
     stats = {"rejected": {f: 0 for f in families}, "kept_after_max_tries": {f: 0 for f in families},

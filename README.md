@@ -1,8 +1,12 @@
-<p align="center"><img src="docs/banner.svg" width="100%" alt="ClaimShield"></p>
+<p align="center"><img src="docs/banner.svg" width="100%" alt="Truvix"></p>
 
-A host says the guest broke the table and sends a photo. Was the crack really there, or was it painted in, pasted in, or generated? ClaimShield scores a damage-claim photo for signs of local editing and draws a heatmap of where the edit is, so a reviewer looks at the right part of the picture before money moves.
+A host says the guest broke the table and sends a photo. Was the crack really there, or was it painted in, pasted in, or generated? Truvix scores a damage-claim photo for signs of local editing and draws a heatmap of where the edit is, so a reviewer looks at the right part of the picture before money moves.
 
-**Start here:** [the illustrated guide (PDF, 14 pages)](docs/ClaimShield_Guide.pdf) · [open the notebook in Colab](https://colab.research.google.com/github/Kaushik-verse/claimshield/blob/main/colab/claimshield_colab.ipynb) (free T4, about 1.5 h end to end) · [results](#results) · [where it fails](#what-does-not-work)
+**Start here:** [run the app](#use-it) · [the illustrated guide (PDF, 14 pages)](docs/Truvix_Guide.pdf) · [open the notebook in Colab](https://colab.research.google.com/github/Kaushik-verse/truvix/blob/main/colab/truvix_colab.ipynb) (free T4, about 1.5 h end to end) · [results](#results) · [where it fails](#what-does-not-work)
+
+<p align="center"><img src="docs/app.jpg" width="92%" alt="The Truvix app"></p>
+
+*The Truvix app: pick a test photo or upload your own, and see the edit score, the verdict and where the edit is.*
 
 ## Why this exists
 
@@ -49,7 +53,7 @@ Both of those cases were caught by people squinting at pixels. This project asks
 
 **Operating point.** A false flag accuses an honest host or guest, so the threshold is set on the validation split to flag at most 5% of honest photos. It is then frozen for the test set.
 
-**Compute.** The full pipeline runs on a free Colab T4 in about 1.5 hours: 32 minutes to generate the dataset, then training and evaluation (`colab/claimshield_colab.ipynb`). On the 8 GB MacBook Air the Stable Diffusion step is impractical, at about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory.
+**Compute.** The full pipeline runs on a free Colab T4 in about 1.5 hours: 32 minutes to generate the dataset, then training and evaluation (`colab/truvix_colab.ipynb`). On the 8 GB MacBook Air the Stable Diffusion step is impractical, at about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory.
 
 ## Results
 
@@ -118,14 +122,23 @@ Localisation (pixel F1 of the heatmap at 0.5 against the true edit mask): splice
 ## Use it
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"            # add ".[generate]" for the diffusion family
-python -m pytest -q tests                                       # 12 passed
-python scripts/demo.py && open demo_output.png                  # heatmaps on 12 example photos
-python -m claimshield.cli claim.jpg --heatmap claim_heatmap.png # your own photo
+git clone https://github.com/Kaushik-verse/truvix.git && cd truvix
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev,app]"        # add ".[generate]" for the diffusion family
+streamlit run app.py               # opens http://localhost:8501
 ```
 
-To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T4 and Run all (about 1.5 h). The notebook clones this repository, then runs each step in its own cell with a short explanation, and shows the result tables and heatmaps inline. `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
+The app opens on **Try it**: click a test photo from the gallery or drop in your own, and the score gauge, the verdict and the heatmap appear side by side. **How it works** and **Results** explain the project. The **Developer tools** page in the sidebar holds the review threshold, batch checking of many photos, and a button that runs the 13 automated tests.
+
+The same things from the terminal:
+
+```bash
+python -m pytest -q tests                                    # 13 passed
+python scripts/demo.py && open demo_output.png               # one sheet with 12 heatmaps
+python -m truvix.cli claim.jpg --heatmap claim_heatmap.png   # a single photo
+```
+
+To rebuild everything, open `colab/truvix_colab.ipynb` in Colab, choose a T4 and Run all (about 1.5 h). The notebook clones this repository, then runs each step in its own cell with a short explanation, and shows the result tables and heatmaps inline. `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
 
 ## References
 
@@ -152,6 +165,6 @@ To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T
 - **Code: MIT** © 2026 Ch Kaushik ([LICENSE](LICENSE)).
 - **The example photos in `docs/` and the trained weights in `models/` are derived from MIT Indoor-67. They are for research and education only** and are not covered by the MIT License. If you own one of the photos and want it removed, open an issue.
 - The edited and generated images exist only to train and test a detector. They show no real claim, and must not be used to deceive anyone.
-- **ClaimShield is an independent project. It is not affiliated with or endorsed by Airbnb, Inc.** The company is named only to cite public news reports.
+- **Truvix is an independent project. It is not affiliated with or endorsed by Airbnb, Inc.** The company is named only to cite public news reports.
 
 Full details are in [NOTICE.md](NOTICE.md). If you use this work, please cite it ([CITATION.cff](CITATION.cff)) together with the papers above.

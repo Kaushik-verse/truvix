@@ -17,9 +17,9 @@ from sklearn.metrics import roc_auc_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from claimshield.features import ela_features, srm_features
-from claimshield.patchnet import device, heatmap, load as load_net
-from claimshield.postprocess import attack
+from truvix.features import ela_features, srm_features
+from truvix.patchnet import device, heatmap, load as load_net
+from truvix.postprocess import attack
 
 FAMILIES = ["paint", "splice", "diffusion"]
 ATTACKS = ["jpeg50", "half", "screenshot"]

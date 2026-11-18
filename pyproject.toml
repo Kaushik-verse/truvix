@@ -1,5 +1,5 @@
 [project]
-name = "claimshield"
+name = "truvix"
 version = "0.1.0"
 description = "Flag and localise doctored damage-claim photos."
 license = { text = "MIT" }
@@ -13,9 +13,10 @@ dependencies = [
 [project.optional-dependencies]
 generate = ["diffusers==0.35.1", "transformers>=4.40", "peft>=0.17", "accelerate>=1.0"]
 dev = ["pytest>=8"]
+app = ["streamlit==1.40.2", "pandas>=2", "pyarrow>=17"]
 
 [project.scripts]
-claimshield = "claimshield.cli:main"
+truvix = "truvix.cli:main"
 
 [tool.setuptools]
-packages = ["claimshield"]
+packages = ["truvix"]

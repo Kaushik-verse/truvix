@@ -1,6 +1,6 @@
 # Notices, licences and attribution
 
-ClaimShield's **source code** is released under the MIT License (see `LICENSE`), © 2026 Ch Kaushik.
+Truvix's **source code** is released under the MIT License (see `LICENSE`), © 2026 Ch Kaushik.
 The MIT License covers only the code and the original diagrams (`docs/banner.svg`, `docs/pipeline.svg`, `docs/results.svg`). Everything listed below keeps its own terms.
 
 ## Images
@@ -28,7 +28,7 @@ Notes on the Stable Diffusion licence:
 - No model weights are redistributed here. They are downloaded at run time from the Hugging Face Hub, under their own licences.
 - Under CreativeML OpenRAIL-M §6 the licensor claims no rights in generated outputs. The user stays accountable for how outputs are used.
 - The licence's use restrictions (Attachment A) forbid, among other things, generating "verifiably false information and/or content with the purpose of harming others". This project generates edits only to *detect* that kind of content, which is the opposite purpose.
-- The ClaimShield detector is an image classifier. It does not generate images or imitate Stable Diffusion.
+- The Truvix detector is an image classifier. It does not generate images or imitate Stable Diffusion.
 
 **`models/patchnet.pt` (the trained detector)**
 - It was fine-tuned from ImageNet weights on images derived from MIT Indoor-67, so it is provided **for research and education only**.
@@ -54,7 +54,7 @@ The methods and baselines build on the papers listed under *References* in `READ
 ## News sources and trademarks
 
 - The motivating cases are described from public reporting, with links: Your Mileage May Vary (21 Oct 2026), The Guardian (2 Aug 2025), AI Incident Database #1161, and the Airbnb Newsroom (17 Jun 2026). One short sentence from the Airbnb Newsroom is quoted with attribution.
-- **ClaimShield is an independent research project. It is not affiliated with, endorsed by or sponsored by Airbnb, Inc. or any other company named here.** "Airbnb" is a trademark of Airbnb, Inc. and is used only to refer to public news reports.
+- **Truvix is an independent research project. It is not affiliated with, endorsed by or sponsored by Airbnb, Inc. or any other company named here.** "Airbnb" is a trademark of Airbnb, Inc. and is used only to refer to public news reports.
 
 ## No warranty, not a verdict
 

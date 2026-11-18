@@ -1,6 +1,6 @@
 """Check a claim photo.
 
-  python -m claimshield.cli photo.jpg --heatmap out.png
+  python -m truvix.cli photo.jpg --heatmap out.png
 """
 import argparse
 import json

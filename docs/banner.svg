@@ -1,5 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 200" font-family="Georgia, 'Times New Roman', serif">
   <rect width="880" height="200" fill="#F7F6F2"/>
+  <!-- logo mark -->
+  <g transform="translate(40,44) scale(0.9)">
+    <rect x="2" y="2" width="60" height="60" rx="14" fill="#1E4D8C"/>
+    <g fill="#DCE5F2" opacity="0.9">
+      <rect x="15" y="15" width="9" height="9" rx="1.5"/><rect x="27.5" y="15" width="9" height="9" rx="1.5"/><rect x="40" y="15" width="9" height="9" rx="1.5"/>
+      <rect x="15" y="27.5" width="9" height="9" rx="1.5"/><rect x="40" y="27.5" width="9" height="9" rx="1.5"/>
+      <rect x="15" y="40" width="9" height="9" rx="1.5"/><rect x="27.5" y="40" width="9" height="9" rx="1.5"/><rect x="40" y="40" width="9" height="9" rx="1.5"/>
+    </g>
+    <rect x="27.5" y="27.5" width="9" height="9" rx="1.5" fill="#E07A4F"/>
+    <circle cx="32" cy="32" r="10.5" fill="none" stroke="#FFFFFF" stroke-width="2.6"/>
+    <line x1="39.6" y1="39.6" x2="47" y2="47" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
+  </g>
+  <text x="112" y="92" font-size="44" fill="#1E4D8C">Truvix</text>
+  <text x="40" y="138" font-size="17" fill="#2B2B2B">Spotting doctored photos in short-term rental damage claims,</text>
+  <text x="40" y="162" font-size="17" fill="#2B2B2B">and showing exactly where the edit is.</text>
   <!-- a claim photo with a doctored patch, and the detector's window over it -->
   <g transform="translate(640,34)">
     <rect width="190" height="132" fill="#FFFFFF" stroke="#C9C6BC"/>
@@ -9,7 +24,4 @@
     <path d="M70 104 q14 -10 28 0 q14 9 26 -2 q10 -8 18 3 q-8 14 -34 12 q-26 2 -38 -13z" fill="#B4552D" opacity="0.75"/>
     <rect x="58" y="84" width="96" height="44" fill="none" stroke="#1E4D8C" stroke-width="2" stroke-dasharray="5 4"/>
   </g>
-  <text x="40" y="92" font-size="40" fill="#1E4D8C">ClaimShield</text>
-  <text x="40" y="128" font-size="17" fill="#2B2B2B">Spotting doctored photos in short-term-rental damage claims,</text>
-  <text x="40" y="152" font-size="17" fill="#2B2B2B">and showing where the edit is.</text>
 </svg>

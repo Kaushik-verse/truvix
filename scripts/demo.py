@@ -12,8 +12,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-from claimshield.cli import load_model, overlay
-from claimshield.patchnet import heatmap
+from truvix.cli import load_model, overlay
+from truvix.patchnet import heatmap
 
 SKIP = ("_mask", "_original", "_heatmap")
 BG, INK, RISK = (247, 246, 242), (43, 43, 43), (180, 85, 45)

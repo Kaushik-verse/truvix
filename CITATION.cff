@@ -1,10 +1,10 @@
 cff-version: 1.2.0
-message: "If you use ClaimShield, please cite it as below, together with the MIT Indoor-67 dataset paper."
-title: "ClaimShield: detecting doctored photos in rental damage claims"
+message: "If you use Truvix, please cite it as below, together with the MIT Indoor-67 dataset paper."
+title: "Truvix: detecting doctored photos in rental damage claims"
 type: software
 authors:
   - name: "Ch Kaushik"
-repository-code: "https://github.com/Kaushik-verse/claimshield"
+repository-code: "https://github.com/Kaushik-verse/truvix"
 license: MIT
 date-released: "2026-11-18"
 keywords:

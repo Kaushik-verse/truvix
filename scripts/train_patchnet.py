@@ -19,8 +19,8 @@ import torch.nn as nn
 from PIL import Image
 from sklearn.metrics import roc_auc_score
 
-from claimshield.patchnet import ARCHS, PATCH, build, device, grid, heatmap, patch_labels, to_tensor
-from claimshield.postprocess import jpeg
+from truvix.patchnet import ARCHS, PATCH, build, device, grid, heatmap, patch_labels, to_tensor
+from truvix.postprocess import jpeg
 
 import cv2
 
