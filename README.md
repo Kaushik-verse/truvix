@@ -22,7 +22,11 @@ Both of those cases were caught by people squinting at pixels. This project asks
 | OpenCV inpaint (test only) | an editing tool the model never saw | OpenCV Telea inpainting |
 | fully generated (test only) | a whole fake photo, as in the Australian case | the same SD model with the entire frame masked, e.g. "a flooded bathroom with water all over the floor" |
 
-**Every edit must be visible.** A fake claim photo has to show something, so each edit must visibly change at least 0.4% of the image, measured as the smoothed RGB difference against the honest copy. Otherwise it is retried with a new seed. The label mask is the set of pixels that actually changed. Retries were rare: 32 of 1,653 paint edits, 15 diffusion edits, and 1 diffusion edit still too faint after 4 tries (`data/generation_stats.json`).
+**Every edit must be visible.** A fake claim photo has to show something, so each edit must visibly change at least 0.4% of the image, measured as the smoothed RGB difference against the honest copy. Otherwise it is retried with a new seed. The label mask is the set of pixels that actually changed. Retries were rare: 32 paint and 15 diffusion edits needed a new seed, and 1 diffusion edit was still too faint after 4 tries (`data/generation_stats.json`).
+
+<p align="center"><img src="docs/dataset_examples.jpg" width="78%" alt="dataset examples"></p>
+
+*One test example per edit type: the one with the largest edit, so the change is visible. The diffusion row was prompted with "a dark brown water stain" but mostly re-drew the chairs, which is typical of SD 1.5 inpainting.*
 
 | split | honest | edited |
 |---|---|---|
@@ -78,13 +82,11 @@ Robustness: every test photo laundered once more after delivery.
 
 Localisation (pixel F1 of the heatmap at 0.5 against the true edit mask): splice 0.40, paint 0.15, diffusion 0.10.
 
-<p align="center"><img src="docs/examples/heatmaps.png" width="72%" alt="examples"></p>
+<p align="center"><img src="docs/heatmaps_random.jpg" width="100%" alt="heatmaps on random test photos"></p>
 
-*Left: claim photo. Middle: true edit in blue. Right: heatmap in terracotta. The rows show one of each outcome, not only the good ones:*
-1. *A pasted patch: caught, score 1.00.*
-2. *A painted stain on the toilet seat: caught, 0.9995.*
-3. *A diffusion edit that added a jar and changed the tap: missed, 0.03.*
-4. *An honest photo: falsely flagged, 0.99.*
+*Twelve test photos, two per type, drawn at random with a fixed seed rather than hand-picked. Terracotta shading is the heatmap; red titles are mistakes. 8 of 12 are correct, which matches the rates above:*
+- *Pasted regions and the unseen OpenCV inpainting are caught and localised.*
+- *Missed: both diffusion edits, one faint paint edit, and one fully generated room.*
 
 ### Progress across versions
 
