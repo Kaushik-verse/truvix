@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/bases/
+data/images/
+data/masks/
+models/*.pt
+.DS_Store

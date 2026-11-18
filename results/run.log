@@ -1,0 +1,274 @@
+train patches: 1737 edited / 13054 clean; val 265 / 1773
+{'epoch': 1, 'train_loss': 0.43253932988499527, 'val_patch_auc': 0.9277336142770487, 'sec': 29.31743288040161}
+{'epoch': 2, 'train_loss': 0.2466615039724417, 'val_patch_auc': 0.9670274239376816, 'sec': 24.418920755386353}
+{'epoch': 3, 'train_loss': 0.15183352157859606, 'val_patch_auc': 0.9707286445529908, 'sec': 22.89566421508789}
+{'epoch': 4, 'train_loss': 0.10977077605090199, 'val_patch_auc': 0.9768625823409849, 'sec': 22.725783109664917}
+{'epoch': 5, 'train_loss': 0.08747870989345448, 'val_patch_auc': 0.9765497132032903, 'sec': 21.847250938415527}
+train patches: 1259 edited / 10380 clean; val 206 / 1498
+{'epoch': 1, 'train_loss': 0.36169562214797596, 'val_patch_auc': 0.9698368050604689, 'sec': 27.488289833068848}
+{'epoch': 2, 'train_loss': 0.1967348898091517, 'val_patch_auc': 0.9540779291482494, 'sec': 19.614758253097534}
+{'epoch': 3, 'train_loss': 0.14003468247765202, 'val_patch_auc': 0.9895005638586076, 'sec': 14.7048921585083}
+train patches: 478 edited / 10638 clean; val 59 / 1378
+{'epoch': 1, 'train_loss': 0.566434148964024, 'val_patch_auc': 0.9136921600944626, 'sec': 17.349059104919434}
+{'epoch': 2, 'train_loss': 0.2979528544213483, 'val_patch_auc': 0.9051191852598952, 'sec': 6.159376859664917}
+{'epoch': 3, 'train_loss': 0.17141719433677746, 'val_patch_auc': 0.9400752749009864, 'sec': 6.412704944610596}
+features ...
+ela_lr
+srm_lr
+patchnet
+{
+  "counts": {
+    "train": {
+      "authentic": 660,
+      "edited": 660
+    },
+    "val": {
+      "authentic": 94,
+      "edited": 94
+    },
+    "test": {
+      "authentic": 188,
+      "edited": 188
+    },
+    "ood": {
+      "authentic": 0,
+      "edited": 188
+    }
+  },
+  "detectors": {
+    "ela_lr": {
+      "threshold": 0.51796,
+      "test": {
+        "auc": 0.5238,
+        "tpr": 0.0904,
+        "fpr": 0.0745,
+        "bal_acc": 0.508,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.5395,
+          "tpr": 0.1,
+          "fpr": 0.0745,
+          "bal_acc": 0.5128,
+          "n": 288
+        },
+        "splice": {
+          "auc": 0.5059,
+          "tpr": 0.0795,
+          "fpr": 0.0745,
+          "bal_acc": 0.5025,
+          "n": 276
+        }
+      },
+      "unseen_tools": {
+        "telea_unseen": {
+          "auc": 0.4499,
+          "tpr": 0.0638,
+          "fpr": 0.0745,
+          "bal_acc": 0.4947,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.4889,
+          "tpr": 0.0426,
+          "fpr": 0.0479,
+          "bal_acc": 0.4973,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.5235,
+          "tpr": 0.1223,
+          "fpr": 0.1809,
+          "bal_acc": 0.4707,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.505,
+          "tpr": 0.0745,
+          "fpr": 0.117,
+          "bal_acc": 0.4787,
+          "n": 376
+        }
+      }
+    },
+    "srm_lr": {
+      "threshold": 0.608869,
+      "test": {
+        "auc": 0.5489,
+        "tpr": 0.0798,
+        "fpr": 0.0479,
+        "bal_acc": 0.516,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.5262,
+          "tpr": 0.09,
+          "fpr": 0.0479,
+          "bal_acc": 0.5211,
+          "n": 288
+        },
+        "splice": {
+          "auc": 0.5748,
+          "tpr": 0.0682,
+          "fpr": 0.0479,
+          "bal_acc": 0.5102,
+          "n": 276
+        }
+      },
+      "unseen_tools": {
+        "telea_unseen": {
+          "auc": 0.5222,
+          "tpr": 0.0691,
+          "fpr": 0.0479,
+          "bal_acc": 0.5106,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.4887,
+          "tpr": 0.0638,
+          "fpr": 0.0372,
+          "bal_acc": 0.5133,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.5058,
+          "tpr": 0.3351,
+          "fpr": 0.3723,
+          "bal_acc": 0.4814,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.5081,
+          "tpr": 0.0213,
+          "fpr": 0.0426,
+          "bal_acc": 0.4894,
+          "n": 376
+        }
+      }
+    },
+    "patchnet": {
+      "threshold": 0.992222,
+      "test": {
+        "auc": 0.8209,
+        "tpr": 0.5426,
+        "fpr": 0.016,
+        "bal_acc": 0.7633,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.7052,
+          "tpr": 0.28,
+          "fpr": 0.016,
+          "bal_acc": 0.632,
+          "n": 288
+        },
+        "splice": {
+          "auc": 0.9524,
+          "tpr": 0.8409,
+          "fpr": 0.016,
+          "bal_acc": 0.9125,
+          "n": 276
+        }
+      },
+      "unseen_tools": {
+        "telea_unseen": {
+          "auc": 0.9135,
+          "tpr": 0.5638,
+          "fpr": 0.016,
+          "bal_acc": 0.7739,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.8304,
+          "tpr": 0.5372,
+          "fpr": 0.0372,
+          "bal_acc": 0.75,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.7235,
+          "tpr": 0.1862,
+          "fpr": 0.0053,
+          "bal_acc": 0.5904,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.8254,
+          "tpr": 0.6489,
+          "fpr": 0.1277,
+          "bal_acc": 0.7606,
+          "n": 376
+        }
+      }
+    }
+  },
+  "localisation": {
+    "paint": {
+      "pixel_f1": 0.182,
+      "iou": 0.1216,
+      "n": 100
+    },
+    "splice": {
+      "pixel_f1": 0.3732,
+      "iou": 0.2418,
+      "n": 88
+    }
+  },
+  "lofo": {
+    "paint": {
+      "ela_lr": {
+        "auc": 0.493,
+        "tpr": 0.0,
+        "fpr": 0.016,
+        "bal_acc": 0.492,
+        "n": 288
+      },
+      "srm_lr": {
+        "auc": 0.5527,
+        "tpr": 0.06,
+        "fpr": 0.0372,
+        "bal_acc": 0.5114,
+        "n": 288
+      },
+      "patchnet": {
+        "auc": 0.5482,
+        "tpr": 0.04,
+        "fpr": 0.016,
+        "bal_acc": 0.512,
+        "n": 288
+      }
+    },
+    "splice": {
+      "ela_lr": {
+        "auc": 0.4848,
+        "tpr": 0.0455,
+        "fpr": 0.0585,
+        "bal_acc": 0.4935,
+        "n": 276
+      },
+      "srm_lr": {
+        "auc": 0.5455,
+        "tpr": 0.0682,
+        "fpr": 0.016,
+        "bal_acc": 0.5261,
+        "n": 276
+      },
+      "patchnet": {
+        "auc": 0.5326,
+        "tpr": 0.1023,
+        "fpr": 0.0585,
+        "bal_acc": 0.5219,
+        "n": 276
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+[project]
+name = "claimshield"
+version = "0.1.0"
+description = "Flag and localise doctored damage-claim photos."
+license = { text = "MIT" }
+authors = [{ name = "Ch Kaushik" }]
+requires-python = ">=3.10"
+dependencies = [
+  "numpy>=1.26", "pillow>=10", "opencv-python-headless>=4.10", "scikit-learn>=1.4",
+  "torch>=2.2", "torchvision>=0.17",
+]
+
+[project.optional-dependencies]
+generate = ["diffusers==0.35.1", "transformers>=4.40", "peft>=0.17", "accelerate>=1.0"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+claimshield = "claimshield.cli:main"
+
+[tool.setuptools]
+packages = ["claimshield"]
