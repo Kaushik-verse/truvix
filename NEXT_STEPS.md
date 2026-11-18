@@ -23,5 +23,3 @@
 ## Reproduce
 
 Open `colab/claimshield_colab.ipynb` in Colab (it clones the public repo), choose T4, Run all (about 1.5 h). The last cell downloads `claimshield_results.tar.gz`.
-
-Before pushing: push only when Kaushik says so, with the author set to the user only and no co-author trailer.
