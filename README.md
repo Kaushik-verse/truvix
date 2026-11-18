@@ -43,7 +43,7 @@ Both of those cases were caught by people squinting at pixels. This project asks
 
 **Operating point.** A false flag accuses an honest host or guest, so the threshold is set on the validation split to flag at most 5% of honest photos. It is then frozen for the test set.
 
-**Compute.** The full pipeline runs on a free Colab T4 in about 1.5 hours: 32 minutes to generate the dataset, then training and evaluation (`colab/claimshield_colab_v3.ipynb`). On the 8 GB MacBook Air the Stable Diffusion step is impractical, at about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory.
+**Compute.** The full pipeline runs on a free Colab T4 in about 1.5 hours: 32 minutes to generate the dataset, then training and evaluation (`colab/claimshield_colab.ipynb`). On the 8 GB MacBook Air the Stable Diffusion step is impractical, at about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory.
 
 ## Results
 
@@ -119,7 +119,7 @@ pip install -e ".[dev]"            # add ".[generate]" for the diffusion family
 python -m claimshield.cli claim.jpg --heatmap claim_heatmap.png
 ```
 
-To rebuild everything, upload `colab/claimshield_colab_v3.ipynb` to Colab, choose a T4 and Run all (about 1.5 h). `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
+To rebuild everything, open `colab/claimshield_colab.ipynb` in Colab, choose a T4 and Run all (about 1.5 h). The notebook clones this repository, then runs each step in its own cell with a short explanation, and shows the result tables and heatmaps inline. `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
 
 ## References
 
