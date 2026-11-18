@@ -15,7 +15,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import streamlit as st
-from PIL import Image
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from truvix.cli import load_model, overlay
 from truvix.patchnet import heatmap
@@ -34,7 +34,7 @@ TAG = {"authentic": "honest", "paint": "edited", "splice": "edited", "diffusion"
 MAX_SIDE = 1024
 
 st.set_page_config(page_title="Truvix · doctored photo detector", page_icon=str(ROOT / "docs" / "logo.svg"),
-                   layout="wide", initial_sidebar_state="expanded")
+                   layout="wide", initial_sidebar_state="auto")  # open on desktop, folded on phones
 
 # ------------------------------------------------------------------ styling
 st.markdown(f"""
@@ -58,6 +58,10 @@ st.markdown(f"""
 
   .tv-hero {{ display: flex; align-items: center; gap: 22px; padding: 26px 30px; border-radius: 18px;
      background: #FFFFFF; border: 1px solid #E4E0D6; box-shadow: 0 1px 2px rgba(43,43,43,.04), 0 8px 24px rgba(43,43,43,.05); margin-bottom: 18px; }}
+  @media (max-width: 640px) {{
+    .tv-hero {{ flex-direction: column; align-items: flex-start; gap: 14px; padding: 20px; }}
+    .tv-hero > div:first-child {{ width: 52px !important; height: 52px !important; }}
+  }}
   .tv-chip {{ display: inline-block; font-size: .78rem; padding: 3px 11px; margin: 0 6px 4px 0; border-radius: 999px;
      background: {PAPER}; border: 1px solid #E4E0D6; color: {MUTED}; }}
   .tv-chip b {{ color: {BLUE}; font-weight: 600; }}
@@ -106,8 +110,15 @@ def get_metrics() -> dict:
 
 @st.cache_data(show_spinner=False)
 def analyse(image_bytes: bytes):
-    """(rgb image, heatmap, score). Large photos are shrunk the same way the CLI does."""
-    img = np.asarray(Image.open(io.BytesIO(image_bytes)).convert("RGB"))
+    """(rgb image, heatmap, score). Large photos are shrunk the same way the CLI does.
+
+    Raises ValueError when the bytes are not a readable image (corrupt file, HEIC renamed to .jpg, ...)."""
+    try:
+        pil = Image.open(io.BytesIO(image_bytes))
+        pil = ImageOps.exif_transpose(pil)  # phone photos store their rotation in EXIF
+        img = np.asarray(pil.convert("RGB"))
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as e:
+        raise ValueError("not a readable image") from e
     if max(img.shape[:2]) > MAX_SIDE:
         s = MAX_SIDE / max(img.shape[:2])
         img = cv2.resize(img, None, fx=s, fy=s, interpolation=cv2.INTER_AREA)
@@ -276,9 +287,16 @@ def home():
                 st.info("Tip: take a photo of a room, paste a patch onto it in Preview or Photos, and compare the "
                         "original with the edited version.")
 
+        result = None
         if data is not None:
-            with st.spinner("Scanning the photo window by window…"):
-                img, hm, score = analyse(data)
+            try:
+                with st.spinner("Scanning the photo window by window…"):
+                    result = analyse(data)
+            except ValueError:
+                st.error("Truvix could not open that file as a photo. It may be damaged, or be a different format "
+                         "renamed to .jpg (iPhone HEIC photos, for example). Export it as JPG or PNG and try again.")
+        if result is not None:
+            img, hm, score = result
             st.write("")
             left, mid, right = st.columns([1.15, 1.15, 0.9], gap="medium")
             with left:
@@ -441,17 +459,25 @@ def developer():
         if items:
             rows, tiles = [], []
             bar = st.progress(0.0, text="Scanning…")
+            skipped = []
             for i, (name, data) in enumerate(items):
-                img, hm, score = analyse(data)
+                bar.progress((i + 1) / len(items), text=f"Scanned {i + 1} of {len(items)}")
+                try:
+                    img, hm, score = analyse(data)
+                except ValueError:
+                    skipped.append(name)
+                    continue
                 rows.append({"photo": name, "score": round(score, 3), "verdict": "review" if score > thr else "ok",
                              "area marked": round(float((hm > 0.5).mean()), 3)})
                 tiles.append((name, overlay(img, hm), score))
-                bar.progress((i + 1) / len(items), text=f"Scanned {i + 1} of {len(items)}")
             bar.empty()
+            if skipped:
+                st.warning(f"Skipped {len(skipped)} file(s) that could not be opened as photos: " + ", ".join(skipped))
+        if items and rows:
             df = pd.DataFrame(rows).sort_values("score", ascending=False)
             n_flag = int((df["verdict"] == "review").sum())
             k1, k2, k3 = st.columns(3)
-            k1.markdown(kpi(str(len(df)), "photos scanned"), unsafe_allow_html=True)
+            k1.markdown(kpi(str(len(df)), "photo scanned" if len(df) == 1 else "photos scanned"), unsafe_allow_html=True)
             k2.markdown(kpi(str(n_flag), f"sent to review at threshold {thr:.3f}", risk=n_flag > 0), unsafe_allow_html=True)
             k3.markdown(kpi(f"{df['score'].median():.2f}", "median edit score"), unsafe_allow_html=True)
             st.write("")
