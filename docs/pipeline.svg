@@ -28,7 +28,7 @@
     <!-- column 4 -->
     <rect x="712" y="70" width="146" height="150" rx="4" fill="#1E4D8C"/>
     <text x="728" y="100" font-size="15" fill="#FFFFFF">Patch detector</text>
-    <text x="728" y="124" fill="#DCE5F2">ResNet-18,</text>
+    <text x="728" y="124" fill="#DCE5F2">EfficientNet-B0,</text>
     <text x="728" y="142" fill="#DCE5F2">128 px windows</text>
     <text x="728" y="176" fill="#FFFFFF">score + heatmap</text>
     <text x="728" y="196" fill="#DCE5F2">where was it edited</text>

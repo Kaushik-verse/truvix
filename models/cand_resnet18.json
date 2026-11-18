@@ -1,0 +1,129 @@
+{
+  "arch": "resnet18",
+  "exclude": "",
+  "launder": true,
+  "epochs": 20,
+  "best_val_image_auc": 0.7877685950413224,
+  "log": [
+    {
+      "epoch": 1,
+      "train_loss": 0.5829,
+      "val_image_auc": 0.7077,
+      "sec": 22.6
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.4524,
+      "val_image_auc": 0.6781,
+      "sec": 22.0
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.4172,
+      "val_image_auc": 0.7222,
+      "sec": 22.2
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.3584,
+      "val_image_auc": 0.705,
+      "sec": 22.0
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.3414,
+      "val_image_auc": 0.7545,
+      "sec": 21.8
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.3063,
+      "val_image_auc": 0.7488,
+      "sec": 21.8
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.2751,
+      "val_image_auc": 0.7657,
+      "sec": 22.0
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.2499,
+      "val_image_auc": 0.7113,
+      "sec": 22.0
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.2257,
+      "val_image_auc": 0.7301,
+      "sec": 21.7
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.1944,
+      "val_image_auc": 0.762,
+      "sec": 21.9
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.1777,
+      "val_image_auc": 0.7878,
+      "sec": 22.1
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.1462,
+      "val_image_auc": 0.7524,
+      "sec": 21.8
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.1178,
+      "val_image_auc": 0.7663,
+      "sec": 21.8
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.105,
+      "val_image_auc": 0.782,
+      "sec": 21.9
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.082,
+      "val_image_auc": 0.7449,
+      "sec": 21.8
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.0676,
+      "val_image_auc": 0.7643,
+      "sec": 21.6
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.0665,
+      "val_image_auc": 0.7806,
+      "sec": 21.9
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.0573,
+      "val_image_auc": 0.7802,
+      "sec": 22.0
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.0476,
+      "val_image_auc": 0.7784,
+      "sec": 21.6
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.0468,
+      "val_image_auc": 0.7792,
+      "sec": 21.9
+    }
+  ]
+}

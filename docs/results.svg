@@ -3,39 +3,39 @@
 <text x="24" y="36" font-size="15" fill="#2B2B2B">Held-out test ROC-AUC, all edit types vs honest photos</text>
 <text x="24" y="66" font-size="12.5" fill="#6B6860">ELA + logistic</text>
 <rect x="234" y="52" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="52" width="290.5" height="18" fill="#6B6860"/>
-<text x="530.5" y="66" font-size="12.5" fill="#2B2B2B">0.50</text>
+<rect x="234" y="52" width="293.8" height="18" fill="#6B6860"/>
+<text x="533.8" y="66" font-size="12.5" fill="#2B2B2B">0.51</text>
 <text x="24" y="96" font-size="12.5" fill="#6B6860">SRM noise + logistic</text>
 <rect x="234" y="82" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="82" width="300.2" height="18" fill="#6B6860"/>
-<text x="540.2" y="96" font-size="12.5" fill="#2B2B2B">0.52</text>
-<text x="24" y="126" font-size="12.5" fill="#6B6860">ResNet-18 patch net</text>
+<rect x="234" y="82" width="306.7" height="18" fill="#6B6860"/>
+<text x="546.7" y="96" font-size="12.5" fill="#2B2B2B">0.53</text>
+<text x="24" y="126" font-size="12.5" fill="#6B6860">EfficientNet-B0 patch net</text>
 <rect x="234" y="112" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="112" width="421.4" height="18" fill="#1E4D8C"/>
-<text x="661.4" y="126" font-size="12.5" fill="#2B2B2B">0.73</text>
+<rect x="234" y="112" width="440.3" height="18" fill="#1E4D8C"/>
+<text x="680.3" y="126" font-size="12.5" fill="#2B2B2B">0.76</text>
 <line x1="522.0" y1="48" x2="522.0" y2="138" stroke="#2B2B2B" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
 <text x="526.0" y="152" font-size="11" fill="#6B6860">chance</text>
 <text x="24" y="182" font-size="15" fill="#2B2B2B">Patch net by edit type (terracotta = generative AI)</text>
 <text x="24" y="212" font-size="12.5" fill="#6B6860">painted cracks, stains</text>
 <rect x="234" y="198" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="198" width="395.1" height="18" fill="#1E4D8C"/>
-<text x="635.1" y="212" font-size="12.5" fill="#2B2B2B">0.69</text>
+<rect x="234" y="198" width="391.3" height="18" fill="#1E4D8C"/>
+<text x="631.3" y="212" font-size="12.5" fill="#2B2B2B">0.68</text>
 <text x="24" y="242" font-size="12.5" fill="#6B6860">pasted region</text>
 <rect x="234" y="228" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="228" width="522.5" height="18" fill="#1E4D8C"/>
-<text x="762.5" y="242" font-size="12.5" fill="#2B2B2B">0.91</text>
+<rect x="234" y="228" width="547.9" height="18" fill="#1E4D8C"/>
+<text x="787.9" y="242" font-size="12.5" fill="#2B2B2B">0.95</text>
 <text x="24" y="272" font-size="12.5" fill="#6B6860">SD inpainting</text>
 <rect x="234" y="258" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="258" width="341.5" height="18" fill="#B4552D"/>
-<text x="581.5" y="272" font-size="12.5" fill="#2B2B2B">0.59</text>
+<rect x="234" y="258" width="391.7" height="18" fill="#B4552D"/>
+<text x="631.7" y="272" font-size="12.5" fill="#2B2B2B">0.68</text>
 <text x="24" y="302" font-size="12.5" fill="#6B6860">OpenCV inpaint (unseen)</text>
 <rect x="234" y="288" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="288" width="554.6" height="18" fill="#1E4D8C"/>
-<text x="794.6" y="302" font-size="12.5" fill="#2B2B2B">0.96</text>
+<rect x="234" y="288" width="549.9" height="18" fill="#1E4D8C"/>
+<text x="789.9" y="302" font-size="12.5" fill="#2B2B2B">0.95</text>
 <text x="24" y="332" font-size="12.5" fill="#6B6860">fully generated (unseen)</text>
 <rect x="234" y="318" width="576" height="18" fill="#DDD9CE" opacity="0.45"/>
-<rect x="234" y="318" width="465.4" height="18" fill="#B4552D"/>
-<text x="705.4" y="332" font-size="12.5" fill="#2B2B2B">0.81</text>
+<rect x="234" y="318" width="525.7" height="18" fill="#B4552D"/>
+<text x="765.7" y="332" font-size="12.5" fill="#2B2B2B">0.91</text>
 <line x1="522.0" y1="194" x2="522.0" y2="344" stroke="#2B2B2B" stroke-width="1" stroke-dasharray="3 3" opacity="0.55"/>
 <text x="526.0" y="358" font-size="11" fill="#6B6860">chance</text>
 </svg>

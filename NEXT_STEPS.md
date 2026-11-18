@@ -2,27 +2,26 @@
 
 ## Where things stand (2026-11-18)
 
-- **v2 done.** It has paint, splice and Stable Diffusion edits, plus two edit sources the model never saw. It was generated and trained on a Colab T4 with `colab/claimshield_colab.ipynb` (about 25 min), and the results were copied back here.
-  - Patch net test AUC is 0.73. By edit type: splice 0.91, paint 0.69, diffusion 0.59.
-  - The ELA and SRM baselines score about 0.5.
-  - Full numbers are in `results/metrics.json`, and v1 (paint and splice only) is in `results/v1_paint_splice/`.
-- `models/patchnet.pt` is committed (43 MB) so the CLI works from a clone. The leave-one-family-out models are not committed.
-- The v2 images exist only on Colab. Locally, `data/manifest.csv` describes them, and `docs/examples/` holds one example of each edit type.
+- **v3 is current.** It used 1,653 rooms and visibility-checked SD edits (guidance 1.8, 8 steps). Three backbones were trained with laundering augmentation; EfficientNet-B0 was picked on validation (0.814).
+- **Test results:**
+  - Overall AUC 0.76 [0.73–0.80], with 51% of edits caught and 8.5% of honest photos flagged.
+  - By edit type: splice 0.95, diffusion 0.68, paint 0.68.
+  - Unseen sources: OpenCV inpaint 0.95, fully generated 0.91.
+  - Leave-one-family-out: 0.49–0.64, so it doesn't generalise to unseen editing tools.
+- **Where results live:** `results/` holds v3; earlier versions are in `results/v2/` and `results/v1_paint_splice/`.
+- **What's committed:** `models/patchnet.pt` (EfficientNet-B0, 16 MB). Candidate and leave-one-family-out weights are not committed; their JSON logs are.
+- **Images:** the v3 images exist only on Colab. `data/manifest.csv` describes them, and `docs/examples/` keeps 3 examples per edit type with masks and originals.
+- **Local room photos:** `data/bases` holds the first 190 rooms per type (v2). v3's list (`data/bases_manifest.csv`) extends it to 400.
 
-## Worth doing next
+## Ideas, if continuing
 
-1. **Stronger diffusion edits.** At guidance 1.0, many SD edits barely change the room (see the bottom row of `docs/examples/heatmaps.png`).
-   - Fix: in `DiffusionInpainter.__call__`, set guidance to 1.5–2.0 and steps to 6–8, then re-run the notebook.
-   - Expect a fairer test: higher diffusion recall, or a clearer negative result.
-2. **Train longer.** Validation AUC was still rising at epoch 5. Try 12–15 epochs; that's about 2 minutes on a T4.
-3. **Honest real damage.** Add real damaged-room photos to the honest class, so the model can't learn "damage = fake".
+1. **Real damage.** Add genuinely damaged-room photos to the honest class. This is the most important gap for real use.
+2. **Better diffusion damage.** SD 1.5 inpainting rarely draws damage; it swaps objects. Damage-specific edits could come from an instruction-following editor (e.g. InstructPix2Pix) or a damage LoRA.
+3. **Smarter image scoring.** Learn the aggregation on validation, e.g. mean of the top-k windows, instead of the single maximum window. That should reduce false flags.
+4. **Larger validation set.** The ≤5% false-flag target became 8.5% on test.
 
 ## Reproduce
 
-```bash
-# Colab T4: upload colab/claimshield_colab.ipynb → Runtime → Run all → download claimshield_results.tar.gz
-# Laptop, without diffusion:
-./run_all.sh
-```
+Upload `colab/claimshield_colab_v3.ipynb` to Colab, choose T4, Run all (about 1.5 h), then download `claimshield_results.tar.gz`.
 
 Before pushing: push only when Kaushik says so, with the author set to the user only and no co-author trailer.

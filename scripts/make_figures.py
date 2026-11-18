@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 BG, INK, MUTED, BLUE, RISK, GRID = "#F7F6F2", "#2B2B2B", "#6B6860", "#1E4D8C", "#B4552D", "#DDD9CE"
-NAMES = {"ela_lr": "ELA + logistic", "srm_lr": "SRM noise + logistic", "patchnet": "ResNet-18 patch net"}
+NAMES = {"ela_lr": "ELA + logistic", "srm_lr": "SRM noise + logistic", "patchnet": "EfficientNet-B0 patch net"}
 EDITS = [("paint", "painted cracks, stains", "per_family"), ("splice", "pasted region", "per_family"),
          ("diffusion", "SD inpainting", "per_family"), ("telea_unseen", "OpenCV inpaint (unseen)", "unseen_tools"),
          ("fullgen", "fully generated (unseen)", "unseen_tools")]

@@ -1,0 +1,32 @@
+{
+  "selected": {
+    "checkpoint": "cand_effb0.pt",
+    "arch": "efficientnet_b0",
+    "launder": true,
+    "epochs": 20,
+    "best_val_image_auc": 0.8136
+  },
+  "candidates": [
+    {
+      "checkpoint": "cand_effb0.pt",
+      "arch": "efficientnet_b0",
+      "launder": true,
+      "epochs": 20,
+      "best_val_image_auc": 0.8136
+    },
+    {
+      "checkpoint": "cand_resnet18.pt",
+      "arch": "resnet18",
+      "launder": true,
+      "epochs": 20,
+      "best_val_image_auc": 0.7878
+    },
+    {
+      "checkpoint": "cand_resnet50.pt",
+      "arch": "resnet50",
+      "launder": true,
+      "epochs": 20,
+      "best_val_image_auc": 0.7957
+    }
+  ]
+}

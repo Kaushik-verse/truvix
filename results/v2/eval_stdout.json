@@ -1,0 +1,330 @@
+features ...
+ela_lr
+srm_lr
+patchnet
+{
+  "counts": {
+    "train": {
+      "authentic": 660,
+      "edited": 660
+    },
+    "val": {
+      "authentic": 94,
+      "edited": 94
+    },
+    "test": {
+      "authentic": 188,
+      "edited": 188
+    },
+    "ood": {
+      "authentic": 0,
+      "edited": 248
+    }
+  },
+  "detectors": {
+    "ela_lr": {
+      "threshold": 0.531072,
+      "test": {
+        "auc": 0.5043,
+        "tpr": 0.0213,
+        "fpr": 0.0266,
+        "bal_acc": 0.4973,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.5551,
+          "tpr": 0.0312,
+          "fpr": 0.0266,
+          "bal_acc": 0.5023,
+          "n": 252
+        },
+        "splice": {
+          "auc": 0.5172,
+          "tpr": 0.0312,
+          "fpr": 0.0266,
+          "bal_acc": 0.5023,
+          "n": 252
+        },
+        "diffusion": {
+          "auc": 0.4364,
+          "tpr": 0.0,
+          "fpr": 0.0266,
+          "bal_acc": 0.4867,
+          "n": 248
+        }
+      },
+      "unseen_tools": {
+        "fullgen": {
+          "auc": 0.4916,
+          "tpr": 0.0167,
+          "fpr": 0.0266,
+          "bal_acc": 0.495,
+          "n": 248
+        },
+        "telea_unseen": {
+          "auc": 0.4964,
+          "tpr": 0.0266,
+          "fpr": 0.0266,
+          "bal_acc": 0.5,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.4973,
+          "tpr": 0.0053,
+          "fpr": 0.0266,
+          "bal_acc": 0.4894,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.5146,
+          "tpr": 0.0798,
+          "fpr": 0.0904,
+          "bal_acc": 0.4947,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.5191,
+          "tpr": 0.0213,
+          "fpr": 0.0372,
+          "bal_acc": 0.492,
+          "n": 376
+        }
+      }
+    },
+    "srm_lr": {
+      "threshold": 0.601286,
+      "test": {
+        "auc": 0.5211,
+        "tpr": 0.0372,
+        "fpr": 0.0479,
+        "bal_acc": 0.4947,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.5366,
+          "tpr": 0.0312,
+          "fpr": 0.0479,
+          "bal_acc": 0.4917,
+          "n": 252
+        },
+        "splice": {
+          "auc": 0.5294,
+          "tpr": 0.0625,
+          "fpr": 0.0479,
+          "bal_acc": 0.5073,
+          "n": 252
+        },
+        "diffusion": {
+          "auc": 0.4957,
+          "tpr": 0.0167,
+          "fpr": 0.0479,
+          "bal_acc": 0.4844,
+          "n": 248
+        }
+      },
+      "unseen_tools": {
+        "fullgen": {
+          "auc": 0.6206,
+          "tpr": 0.1667,
+          "fpr": 0.0479,
+          "bal_acc": 0.5594,
+          "n": 248
+        },
+        "telea_unseen": {
+          "auc": 0.5397,
+          "tpr": 0.0691,
+          "fpr": 0.0479,
+          "bal_acc": 0.5106,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.4696,
+          "tpr": 0.0266,
+          "fpr": 0.0213,
+          "bal_acc": 0.5027,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.4911,
+          "tpr": 0.0957,
+          "fpr": 0.1011,
+          "bal_acc": 0.4973,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.5128,
+          "tpr": 0.0372,
+          "fpr": 0.0319,
+          "bal_acc": 0.5027,
+          "n": 376
+        }
+      }
+    },
+    "patchnet": {
+      "threshold": 0.981302,
+      "test": {
+        "auc": 0.7316,
+        "tpr": 0.3777,
+        "fpr": 0.0638,
+        "bal_acc": 0.6569,
+        "n": 376
+      },
+      "per_family": {
+        "paint": {
+          "auc": 0.6859,
+          "tpr": 0.3281,
+          "fpr": 0.0638,
+          "bal_acc": 0.6321,
+          "n": 252
+        },
+        "splice": {
+          "auc": 0.9072,
+          "tpr": 0.6719,
+          "fpr": 0.0638,
+          "bal_acc": 0.804,
+          "n": 252
+        },
+        "diffusion": {
+          "auc": 0.5929,
+          "tpr": 0.1167,
+          "fpr": 0.0638,
+          "bal_acc": 0.5264,
+          "n": 248
+        }
+      },
+      "unseen_tools": {
+        "fullgen": {
+          "auc": 0.808,
+          "tpr": 0.4667,
+          "fpr": 0.0638,
+          "bal_acc": 0.7014,
+          "n": 248
+        },
+        "telea_unseen": {
+          "auc": 0.9629,
+          "tpr": 0.8457,
+          "fpr": 0.0638,
+          "bal_acc": 0.891,
+          "n": 376
+        }
+      },
+      "robustness": {
+        "jpeg50": {
+          "auc": 0.7258,
+          "tpr": 0.2766,
+          "fpr": 0.0319,
+          "bal_acc": 0.6223,
+          "n": 376
+        },
+        "half": {
+          "auc": 0.6265,
+          "tpr": 0.1064,
+          "fpr": 0.0053,
+          "bal_acc": 0.5505,
+          "n": 376
+        },
+        "screenshot": {
+          "auc": 0.713,
+          "tpr": 0.5851,
+          "fpr": 0.2926,
+          "bal_acc": 0.6463,
+          "n": 376
+        }
+      }
+    }
+  },
+  "localisation": {
+    "paint": {
+      "pixel_f1": 0.1415,
+      "iou": 0.0878,
+      "n": 64
+    },
+    "splice": {
+      "pixel_f1": 0.3047,
+      "iou": 0.1943,
+      "n": 64
+    },
+    "diffusion": {
+      "pixel_f1": 0.1634,
+      "iou": 0.1044,
+      "n": 60
+    }
+  },
+  "lofo": {
+    "paint": {
+      "ela_lr": {
+        "auc": 0.5521,
+        "tpr": 0.0,
+        "fpr": 0.0053,
+        "bal_acc": 0.4973,
+        "n": 252
+      },
+      "srm_lr": {
+        "auc": 0.5341,
+        "tpr": 0.0156,
+        "fpr": 0.0266,
+        "bal_acc": 0.4945,
+        "n": 252
+      },
+      "patchnet": {
+        "auc": 0.6215,
+        "tpr": 0.2344,
+        "fpr": 0.0904,
+        "bal_acc": 0.572,
+        "n": 252
+      }
+    },
+    "splice": {
+      "ela_lr": {
+        "auc": 0.5374,
+        "tpr": 0.0625,
+        "fpr": 0.0532,
+        "bal_acc": 0.5047,
+        "n": 252
+      },
+      "srm_lr": {
+        "auc": 0.5083,
+        "tpr": 0.0938,
+        "fpr": 0.0213,
+        "bal_acc": 0.5362,
+        "n": 252
+      },
+      "patchnet": {
+        "auc": 0.6364,
+        "tpr": 0.0312,
+        "fpr": 0.0106,
+        "bal_acc": 0.5103,
+        "n": 252
+      }
+    },
+    "diffusion": {
+      "ela_lr": {
+        "auc": 0.4666,
+        "tpr": 0.0167,
+        "fpr": 0.0266,
+        "bal_acc": 0.495,
+        "n": 248
+      },
+      "srm_lr": {
+        "auc": 0.4848,
+        "tpr": 0.05,
+        "fpr": 0.0585,
+        "bal_acc": 0.4957,
+        "n": 248
+      },
+      "patchnet": {
+        "auc": 0.5365,
+        "tpr": 0.0167,
+        "fpr": 0.0426,
+        "bal_acc": 0.4871,
+        "n": 248
+      }
+    }
+  }
+}

@@ -12,75 +12,102 @@ Both of those cases were caught by people squinting at pixels. This project asks
 
 <p align="center"><img src="docs/pipeline.svg" width="100%" alt="pipeline"></p>
 
-**Own dataset.** The project starts from 942 real photos of bedrooms, living rooms, bathrooms, kitchens and dining rooms (MIT Indoor-67). Every room is used twice: once left honest, and once with fake damage added. Both copies go through the same delivery pipeline: phone-style tone tweaks, a random downscale, JPEG at quality 65–95, and in 30% of cases a second messaging-app JPEG. The detector therefore can't learn "saved twice" or "different size" as a shortcut. Splits are made by room, so a room in the test set was never seen in training.
+**Own dataset.** The project starts from 1,653 real photos of bedrooms, living rooms, bathrooms, kitchens and dining rooms (MIT Indoor-67). Every room is used twice: once left honest, and once with fake damage added. Both copies go through the same delivery pipeline: phone-style tone tweaks, a random downscale, JPEG at quality 65–95, and in 30% of cases a second messaging-app JPEG. The detector therefore can't learn "saved twice" or "different size" as a shortcut. Splits are made by room, so a room in the test set was never seen in training.
 
 | Edit type | What it imitates | How it is made |
 |---|---|---|
 | paint | a phone photo editor | procedural cracks and tinted stains blended into a random region |
 | splice | pasting damage from elsewhere | copy-move or a splice from another photo, darkened and feathered |
-| diffusion | the news case: AI-added damage | Stable Diffusion 1.5 inpainting + LCM-LoRA, prompted with one of 10 damage types ("a dark brown water stain", "a hole punched in the wall", …), pasted back inside the mask |
+| diffusion | AI inpainting, the news case | Stable Diffusion 1.5 inpainting + LCM-LoRA (guidance 1.8, 8 steps) prompted with one of 10 damage types, pasted back inside the mask |
 | OpenCV inpaint (test only) | an editing tool the model never saw | OpenCV Telea inpainting |
 | fully generated (test only) | a whole fake photo, as in the Australian case | the same SD model with the entire frame masked, e.g. "a flooded bathroom with water all over the floor" |
 
+**Every edit must be visible.** A fake claim photo has to show something, so each edit must visibly change at least 0.4% of the image, measured as the smoothed RGB difference against the honest copy. Otherwise it is retried with a new seed. The label mask is the set of pixels that actually changed. Retries were rare: 32 of 1,653 paint edits, 15 diffusion edits, and 1 diffusion edit still too faint after 4 tries (`data/generation_stats.json`).
+
 | split | honest | edited |
 |---|---|---|
-| train | 660 | 660 (217 paint · 214 splice · 229 diffusion) |
-| validation | 94 | 94 |
-| test | 188 | 188 (64 paint · 64 splice · 60 diffusion) |
-| unseen tools | — | 188 OpenCV inpaint · 60 fully generated |
+| train | 1,158 | 1,158 (384 paint · 386 splice · 388 diffusion) |
+| validation | 165 | 165 |
+| test | 330 | 330 (110 paint · 103 splice · 117 diffusion) |
+| unseen tools (test rooms) | — | 330 OpenCV inpaint · 80 fully generated |
 
-The diffusion edits were generated on a free Colab T4 (11 minutes for the whole dataset). On the 8 GB MacBook Air the same step took about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory. `colab/claimshield_colab.ipynb` reproduces the whole run.
+**Detector.** A CNN fine-tuned on 128 px windows, answering "were these pixels edited?". Sliding it over the photo gives a heatmap; the image score is the most suspicious window. Each training photo also gets one extra "laundered" copy (re-saved JPEG, downscaled, or screenshotted), so recompression is not mistaken for editing. Three ImageNet backbones were trained for 20 epochs each, and the one with the best validation score was kept. The test set played no part in that choice.
 
-**Detector.** An ImageNet ResNet-18 fine-tuned on 128 px windows, answering "were these pixels edited?". Sliding it over the photo gives a heatmap; the image score is the most suspicious window. Five epochs take under a minute on a T4, or about 2.5 minutes on the M2.
+| backbone | best validation AUC |
+|---|---|
+| **EfficientNet-B0** (selected) | **0.814** |
+| ResNet-50 | 0.796 |
+| ResNet-18 | 0.788 |
 
 **Baselines.** Error-level analysis (ELA) statistics + logistic regression, and SRM noise-residual statistics (Fridrich & Kodovsky) + logistic regression.
 
 **Operating point.** A false flag accuses an honest host or guest, so the threshold is set on the validation split to flag at most 5% of honest photos. It is then frozen for the test set.
 
+**Compute.** The full pipeline runs on a free Colab T4 in about 1.5 hours: 32 minutes to generate the dataset, then training and evaluation (`colab/claimshield_colab_v3.ipynb`). On the 8 GB MacBook Air the Stable Diffusion step is impractical, at about 9 minutes per image: fp16 returns NaNs on Apple MPS, and fp32 does not fit in memory.
+
 ## Results
 
 <p align="center"><img src="docs/results.svg" width="100%" alt="results"></p>
 
-Held-out test set, threshold frozen from validation.
+Held-out test set: 330 honest and 330 edited photos. Threshold frozen from validation. Brackets show 95% bootstrap intervals.
 
 | detector | ROC-AUC | edited photos caught | honest photos flagged |
 |---|---|---|---|
-| ELA + logistic | 0.50 | 2.1% | 2.7% |
-| SRM noise + logistic | 0.52 | 3.7% | 4.8% |
-| **ResNet-18 patch net** | **0.73** | **37.8%** | **6.4%** |
+| ELA + logistic | 0.51 [0.47–0.55] | 2.1% | 2.4% |
+| SRM noise + logistic | 0.53 [0.49–0.57] | 6.4% | 3.9% |
+| **EfficientNet-B0 patch net** | **0.76 [0.73–0.80]** | **51.2%** | **8.5%** |
 
-Patch net by edit type (honest photos flagged: 6.4% in every row):
+Patch net by edit type (honest photos flagged: 8.5% in every row):
 
 | edit type | ROC-AUC | caught |
 |---|---|---|
-| splice | 0.91 | 67.2% |
-| paint | 0.69 | 32.8% |
-| **diffusion** | **0.59** | **11.7%** |
-| OpenCV inpaint (never trained on) | 0.96 | 84.6% |
-| fully generated photo (never trained on) | 0.81 | 46.7% |
+| splice | 0.95 [0.92–0.98] | 89.3% |
+| diffusion | 0.68 [0.63–0.74] | 28.2% |
+| paint | 0.68 [0.61–0.75] | 40.0% |
+| OpenCV inpaint (never trained on) | 0.95 [0.94–0.97] | 86.1% |
+| **fully generated photo** (never trained on) | **0.91 [0.88–0.94]** | **71.3%** |
 
 Robustness: every test photo laundered once more after delivery.
 
 | extra laundering | ROC-AUC | caught | honest flagged |
 |---|---|---|---|
-| none | 0.73 | 37.8% | 6.4% |
-| re-saved at JPEG 50 | 0.73 | 27.7% | 3.2% |
-| downscaled to half size | 0.63 | 10.6% | 0.5% |
-| screenshot (upscale, blur) | 0.71 | 58.5% | 29.3% |
+| none | 0.76 | 51.2% | 8.5% |
+| re-saved at JPEG 50 | 0.74 | 46.1% | 7.9% |
+| downscaled to half size | 0.67 | 19.1% | 2.4% |
+| screenshot (upscale, blur) | 0.75 | 52.4% | 14.8% |
 
-Localisation (pixel F1 of the heatmap at 0.5 against the true edit mask): splice 0.30, diffusion 0.16, paint 0.14.
+Localisation (pixel F1 of the heatmap at 0.5 against the true edit mask): splice 0.40, paint 0.15, diffusion 0.10.
 
 <p align="center"><img src="docs/examples/heatmaps.png" width="72%" alt="examples"></p>
 
-*Left: claim photo. Middle: true edit in blue. Right: ClaimShield's heatmap in terracotta. Rows, top to bottom: pasted region (flagged, score 0.994), painted stain on the sink (flagged, 0.998), diffusion "water stain" on the shower wall (missed, 0.17).*
+*Left: claim photo. Middle: true edit in blue. Right: heatmap in terracotta. The rows show one of each outcome, not only the good ones:*
+1. *A pasted patch: caught, score 1.00.*
+2. *A painted stain on the toilet seat: caught, 0.9995.*
+3. *A diffusion edit that added a jar and changed the tap: missed, 0.03.*
+4. *An honest photo: falsely flagged, 0.99.*
+
+### Progress across versions
+
+| | v1 | v2 | v3 |
+|---|---|---|---|
+| rooms | 942 | 942 | 1,653 |
+| edit types trained on | paint, splice | + diffusion (guidance 1.0) | + visible-change check, guidance 1.8 |
+| model | ResNet-18, 5 epochs | ResNet-18, 5 epochs | EfficientNet-B0, 20 epochs, laundering, chosen on validation |
+| test AUC | 0.82 * | 0.73 | **0.76** |
+| diffusion AUC | — | 0.59 | **0.68** |
+| fully generated AUC | — | 0.81 | **0.91** |
+| screenshot false flags | 12.8% | 29.3% | **14.8%** |
+
+\* v1 had no diffusion edits, an easier task. Its number is not comparable with v2 and v3. All results are in `results/v1_paint_splice/`, `results/v2/` and `results/`.
 
 ## What does not work
 
-- **AI inpainting is the weak spot.** Diffusion edits, the attack that motivated the project, are caught only 11.7% of the time (AUC 0.59). Part of this is the generator itself: at guidance 1.0, LCM-LoRA often fills the mask with plausible wall or floor rather than visible damage. The bottom example above shows that; a person cannot see that edit either. A stronger prompt-following setup (guidance 1.5–2, more steps) would make a fairer and harder test. That is the next experiment.
-- **Adding diffusion made the other numbers worse.** With only paint and splice edits (v1, `results/v1_paint_splice/`), the same model scored 0.82 AUC with 1.6% false flags. Mixing in near-invisible diffusion edits lowers it to 0.73 with 6.4% false flags. The validation-set threshold also overshoots the 5% target on test.
-- **It does not transfer between editing tools.** Trained without each family and tested on it, the patch net scores 0.62 (paint), 0.64 (splice) and 0.54 (diffusion). The strong score on unseen OpenCV inpainting (0.96) is probably because that tool's smooth fill looks like the feathered splices. It is not evidence of general edit detection.
-- **Classical forensics fail here.** After a downscale and a JPEG re-save, ELA and SRM statistics carry no usable signal (AUC 0.50–0.52).
-- **Screenshots and small images break it.** A screenshot pushes false flags to 29%. Halving the resolution drops recall to 11%.
+- **Local AI inpainting is still the weak spot.** Diffusion edits are caught 28% of the time (AUC 0.68). Looking at the examples, Stable Diffusion rarely draws "damage" when asked to. It usually swaps in a plausible object, such as a jar, a towel or a new tap, and those edits look natural to people as well. Whole fake photos are much easier to spot (0.91) than small AI edits inside a real one.
+- **False flags are above target.** The threshold aimed for ≤5% false flags on validation but produced 8.5% on test. A real deployment would need a larger validation set to set it reliably.
+- **It does not transfer between editing tools.** Trained without each type and tested on it, the detector scores 0.54 (paint), 0.64 (splice) and 0.49 (diffusion). It recognises the tools it was trained on, not editing in general. The good score on unseen OpenCV inpainting (0.95) is most likely because that tool's smooth fill resembles feathered splices.
+- **Classical forensics fail here.** After a downscale and a JPEG re-save, ELA and SRM statistics carry no usable signal (AUC 0.51–0.53).
+- **Small images break it.** Halving the resolution drops recall to 19%.
+- **The models memorise.** Training loss reaches 0.01–0.05 while validation AUC plateaus around 0.8. More real variety would help more than more epochs.
 - **Synthetic damage is not real damage.** No genuinely damaged rooms are in the honest class. A real deployment would need honest damage photos, or the model may learn "damage = fake".
 - **A score is not a verdict.** The output is meant to send a claim to a human reviewer, never to reject it automatically.
 
@@ -92,13 +119,14 @@ pip install -e ".[dev]"            # add ".[generate]" for the diffusion family
 python -m claimshield.cli claim.jpg --heatmap claim_heatmap.png
 ```
 
-To rebuild everything, either run `colab/claimshield_colab.ipynb` on a T4 (about 25 minutes), or run `./run_all.sh` on a laptop, which skips diffusion unless `DIFFUSION=1` is set. `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
+To rebuild everything, upload `colab/claimshield_colab_v3.ipynb` to Colab, choose a T4 and Run all (about 1.5 h). `results/metrics.json` holds every number above. `data/manifest.csv` lists each image with its edit type, split, edit fraction, prompt and JPEG history.
 
 ## References
 
 - Quattoni & Torralba, *Recognizing Indoor Scenes*, CVPR 2009 — base photos (MIT Indoor-67).
 - Fridrich & Kodovsky, *Rich Models for Steganalysis of Digital Images*, IEEE TIFS 2012 — SRM residual filters.
 - He et al., *Deep Residual Learning for Image Recognition*, CVPR 2016, [arXiv:1512.03385](https://arxiv.org/abs/1512.03385).
+- Tan & Le, *EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks*, ICML 2019, [arXiv:1905.11946](https://arxiv.org/abs/1905.11946).
 - Wang et al., *CNN-generated images are surprisingly easy to spot... for now*, CVPR 2020, [arXiv:1912.11035](https://arxiv.org/abs/1912.11035).
 - Ojha et al., *Towards Universal Fake Image Detectors that Generalize Across Generative Models*, CVPR 2023, [arXiv:2302.10174](https://arxiv.org/abs/2302.10174) — why cross-generator generalisation is the hard part.
 - Corvi et al., *On the detection of synthetic images generated by diffusion models*, ICASSP 2023, [arXiv:2211.00680](https://arxiv.org/abs/2211.00680).
